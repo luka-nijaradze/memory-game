@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import Menu from "./components/Menu";
+import GameBoard from "./components/GameBoard";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [gameState, setGameState] = useState("menu");
+  const [config, setConfig] = useState({ theme: "Numbers", size: "4x4" });
+  const [dark, setDark] = useState(() => {
+    return localStorage.getItem("memory-dark") === "true";
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("memory-dark", dark);
+  }, [dark]);
+
+  const startGame = (newConfig) => {
+    setConfig(newConfig);
+    setGameState("playing");
+  };
+
+  const goToMenu = () => {
+    setGameState("menu");
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="font-sans antialiased min-h-screen">
+      {gameState === "menu" ? (
+        <Menu
+          onStart={startGame}
+          dark={dark}
+          onToggleDark={() => setDark((d) => !d)}
+        />
+      ) : (
+        <GameBoard
+          config={config}
+          onNewGame={goToMenu}
+          dark={dark}
+          onToggleDark={() => setDark((d) => !d)}
+        />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
