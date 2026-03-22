@@ -1,17 +1,46 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Sun, Moon,
-  Anchor, Car, FlaskConical, Hand,
-  Snowflake, Coins, Coffee, Dog, Cloud, Ghost,
-  Gift, Heart, Zap, Music, Bike, Camera
-} from 'lucide-react';
-import Card from './Card';
-import WinModal from './WinModal';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Sun,
+  Moon,
+  Anchor,
+  Car,
+  FlaskConical,
+  Hand,
+  Snowflake,
+  Coins,
+  Coffee,
+  Dog,
+  Cloud,
+  Ghost,
+  Gift,
+  Heart,
+  Zap,
+  Music,
+  Bike,
+  Camera,
+} from "lucide-react";
+import Card from "./Card";
+import WinModal from "./WinModal";
 
 const icons = [
-  <Anchor />, <Car />, <FlaskConical />, <Hand />,
-  <Snowflake />, <Coins />, <Coffee />, <Dog />, <Cloud />, <Ghost />,
-  <Gift />, <Heart />, <Zap />, <Music />, <Bike />, <Camera />,
-  <Sun />, <Moon />
+  <Anchor />,
+  <Car />,
+  <FlaskConical />,
+  <Hand />,
+  <Snowflake />,
+  <Coins />,
+  <Coffee />,
+  <Dog />,
+  <Cloud />,
+  <Ghost />,
+  <Gift />,
+  <Heart />,
+  <Zap />,
+  <Music />,
+  <Bike />,
+  <Camera />,
+  <Sun />,
+  <Moon />,
 ];
 
 const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
@@ -24,12 +53,12 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   const { theme, size } = config;
-  const is6x6 = size === '6x6';
+  const is6x6 = size === "6x6";
   const pairsCount = is6x6 ? 18 : 8;
 
   const initializeGame = useCallback(() => {
     let values = [];
-    if (theme === 'Numbers') {
+    if (theme === "Numbers") {
       values = Array.from({ length: pairsCount }, (_, i) => i + 1);
     } else {
       values = icons.slice(0, pairsCount);
@@ -63,7 +92,8 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
   }, [isTimerRunning, isGameOver]);
 
   const handleCardClick = (id) => {
-    if (flipped.length === 2 || flipped.includes(id) || matched.includes(id)) return;
+    if (flipped.length === 2 || flipped.includes(id) || matched.includes(id))
+      return;
 
     if (!isTimerRunning) setIsTimerRunning(true);
 
@@ -94,14 +124,16 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-navy-dark px-6 py-8 md:py-16 flex flex-col items-center transition-colors duration-300">
       {/* Header */}
       <div className="w-full max-w-[1110px] flex justify-between items-center mb-10 md:mb-20">
-        <h1 className="text-navy dark:text-white text-2xl md:text-4xl font-bold">memory</h1>
+        <h1 className="text-navy dark:text-white text-2xl md:text-4xl font-bold">
+          memory
+        </h1>
         <div className="flex gap-3">
           {/* Dark mode toggle */}
           <button
@@ -127,7 +159,9 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
       </div>
 
       {/* Grid */}
-      <div className={`grid ${is6x6 ? 'grid-cols-6 gap-2 md:gap-4' : 'grid-cols-4 gap-3 md:gap-6'} mb-10 md:mb-24`}>
+      <div
+        className={`grid ${is6x6 ? "grid-cols-6 gap-2 md:gap-4" : "grid-cols-4 gap-3 md:gap-6"} mb-10 md:mb-24`}
+      >
         {cards.map((card) => (
           <Card
             key={card.id}
@@ -145,12 +179,20 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
       {/* Stats */}
       <div className="w-full max-w-[1110px] flex justify-center gap-6 md:gap-8">
         <div className="bg-gray-lighter dark:bg-navy-light flex flex-col md:flex-row items-center md:justify-between px-6 py-4 md:py-6 md:px-8 rounded-xl flex-1 max-w-[255px] transition-colors duration-300">
-          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">Time</span>
-          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">{formatTime(timer)}</span>
+          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">
+            Time
+          </span>
+          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">
+            {formatTime(timer)}
+          </span>
         </div>
         <div className="bg-gray-lighter dark:bg-navy-light flex flex-col md:flex-row items-center md:justify-between px-6 py-4 md:py-6 md:px-8 rounded-xl flex-1 max-w-[255px] transition-colors duration-300">
-          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">Moves</span>
-          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">{moves}</span>
+          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">
+            Moves
+          </span>
+          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">
+            {moves}
+          </span>
         </div>
       </div>
 
