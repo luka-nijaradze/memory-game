@@ -11,6 +11,7 @@ const Menu = ({ onStart, dark, onToggleDark }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-navy dark:bg-navy-dark px-6 transition-colors duration-300">
+      {/* Dark mode toggle */}
       <button
         onClick={onToggleDark}
         className="absolute top-6 right-6 p-2 rounded-full bg-navy-light dark:bg-navy text-white hover:bg-gray-hover transition-all"
@@ -24,6 +25,7 @@ const Menu = ({ onStart, dark, onToggleDark }) => {
       </h1>
 
       <div className="bg-white dark:bg-navy-light w-full max-w-[654px] rounded-2xl p-6 md:p-14 space-y-6 md:space-y-8 transition-colors duration-300">
+        {/* Theme Selection */}
         <div>
           <label className="text-gray-text dark:text-gray-medium font-bold text-sm md:text-xl block mb-3 md:mb-4">
             Select Theme
@@ -44,6 +46,8 @@ const Menu = ({ onStart, dark, onToggleDark }) => {
             ))}
           </div>
         </div>
+
+        {/* Grid Size Selection */}
         <div>
           <label className="text-gray-text dark:text-gray-medium font-bold text-sm md:text-xl block mb-3 md:mb-4">
             Grid Size
@@ -64,6 +68,8 @@ const Menu = ({ onStart, dark, onToggleDark }) => {
             ))}
           </div>
         </div>
+
+        {/* Start Button */}
         <button
           onClick={handleStart}
           className="w-full bg-orange hover:bg-orange-hover text-white py-3 md:py-4 rounded-full text-lg md:text-3xl font-bold transition-all mt-4"
