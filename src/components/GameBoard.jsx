@@ -27,13 +27,13 @@ const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
     "🎪",
     "🎨",
     "🎭",
-    "🎪",
-    "🎯",
     "🎲",
     "🎸",
     "🎺",
     "🎻",
     "🎹",
+    "🦊",
+    "🐱",
   ];
   const numbers = Array.from({ length: 18 }, (_, i) => i + 1);
 
