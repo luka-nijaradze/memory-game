@@ -1,163 +1,180 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Sun, Moon,
-  Anchor, Car, FlaskConical, Hand,
-  Snowflake, Coins, Coffee, Dog, Cloud, Ghost,
-  Gift, Heart, Zap, Music, Bike, Camera
-} from 'lucide-react';
-import Card from './Card';
-import WinModal from './WinModal';
-
-const icons = [
-  <Anchor />, <Car />, <FlaskConical />, <Hand />,
-  <Snowflake />, <Coins />, <Coffee />, <Dog />, <Cloud />, <Ghost />,
-  <Gift />, <Heart />, <Zap />, <Music />, <Bike />, <Camera />,
-  <Sun />, <Moon />
-];
+import React, { useState, useEffect } from "react";
+import Card from "./Card";
+import WinModal from "./WinModal";
+import { Sun, Moon } from "lucide-react";
 
 const GameBoard = ({ config, onNewGame, dark, onToggleDark }) => {
-  const [cards, setCards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
-  const [matched, setMatched] = useState([]);
-  const [moves, setMoves] = useState(0);
-  const [timer, setTimer] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-
   const { theme, size } = config;
-  const is6x6 = size === '6x6';
-  const pairsCount = is6x6 ? 18 : 8;
+  const [cards, setCards] = useState([]);
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [matchedCards, setMatchedCards] = useState([]);
+  const [moves, setMoves] = useState(0);
+  const [time, setTime] = useState(0);
+  const [gameWon, setGameWon] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const initializeGame = useCallback(() => {
-    let values = [];
-    if (theme === 'Numbers') {
-      values = Array.from({ length: pairsCount }, (_, i) => i + 1);
-    } else {
-      values = icons.slice(0, pairsCount);
-    }
-
-    const shuffled = [...values, ...values]
-      .sort(() => Math.random() - 0.5)
-      .map((v, i) => ({ id: i, value: v }));
-
-    setCards(shuffled);
-    setFlipped([]);
-    setMatched([]);
-    setMoves(0);
-    setTimer(0);
-    setIsGameOver(false);
-    setIsTimerRunning(false);
-  }, [theme, pairsCount]);
+  const is6x6 = size === "6x6";
+  const numPairs = is6x6 ? 18 : 8;
+  const icons = [
+    "🎮",
+    "🚀",
+    "⭐",
+    "🌙",
+    "🔥",
+    "💎",
+    "🎯",
+    "🏆",
+    "🎪",
+    "🎨",
+    "🎭",
+    "🎲",
+    "🎸",
+    "🎺",
+    "🎻",
+    "🎹",
+    "🦊",
+    "🐱",
+  ];
+  const numbers = Array.from({ length: 18 }, (_, i) => i + 1);
 
   useEffect(() => {
     initializeGame();
-  }, [initializeGame]);
+  }, [theme, size]);
 
   useEffect(() => {
     let interval;
-    if (isTimerRunning && !isGameOver) {
+    if (isPlaying && !gameWon) {
       interval = setInterval(() => {
-        setTimer((prev) => prev + 1);
+        setTime((t) => t + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isTimerRunning, isGameOver]);
+  }, [isPlaying, gameWon]);
 
-  const handleCardClick = (id) => {
-    if (flipped.length === 2 || flipped.includes(id) || matched.includes(id)) return;
-
-    if (!isTimerRunning) setIsTimerRunning(true);
-
-    const newFlipped = [...flipped, id];
-    setFlipped(newFlipped);
-
-    if (newFlipped.length === 2) {
-      setMoves((prev) => prev + 1);
-      const [firstId, secondId] = newFlipped;
-
-      if (cards[firstId].value === cards[secondId].value) {
-        setMatched((prev) => {
-          const newMatched = [...prev, firstId, secondId];
-          if (newMatched.length === cards.length) {
-            setIsGameOver(true);
-          }
-          return newMatched;
-        });
-        setFlipped([]);
+  useEffect(() => {
+    if (flippedCards.length === 2) {
+      const [first, second] = flippedCards;
+      if (cards[first] === cards[second]) {
+        setMatchedCards((prev) => [...prev, first, second]);
+        setFlippedCards([]);
       } else {
-        setTimeout(() => {
-          setFlipped([]);
-        }, 1000);
+        setTimeout(() => setFlippedCards([]), 1000);
       }
+      setMoves((m) => m + 1);
+    }
+  }, [flippedCards, cards]);
+
+  useEffect(() => {
+    if (
+      matchedCards.length > 0 &&
+      matchedCards.length === cards.length &&
+      cards.length > 0
+    ) {
+      setGameWon(true);
+      setIsPlaying(false);
+    }
+  }, [matchedCards, cards]);
+
+  const initializeGame = () => {
+    const values =
+      theme === "Icons" ? icons.slice(0, numPairs) : numbers.slice(0, numPairs);
+    const shuffled = [...values, ...values].sort(() => Math.random() - 0.5);
+    setCards(shuffled);
+    setFlippedCards([]);
+    setMatchedCards([]);
+    setMoves(0);
+    setTime(0);
+    setGameWon(false);
+    setIsPlaying(true);
+  };
+
+  const handleCardClick = (index) => {
+    if (
+      flippedCards.length < 2 &&
+      !flippedCards.includes(index) &&
+      !matchedCards.includes(index)
+    ) {
+      setFlippedCards((prev) => [...prev, index]);
     }
   };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const gridCols = is6x6 ? "grid-cols-6" : "grid-cols-4";
+
   return (
-    <div className="min-h-screen bg-white dark:bg-navy-dark px-6 py-8 md:py-16 flex flex-col items-center transition-colors duration-300">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${dark ? "bg-navy-dark" : "bg-gray-light"}`}
+    >
       {/* Header */}
-      <div className="w-full max-w-[1110px] flex justify-between items-center mb-10 md:mb-20">
-        <h1 className="text-navy dark:text-white text-2xl md:text-4xl font-bold">memory</h1>
-        <div className="flex gap-3">
-          {/* Dark mode toggle */}
-          <button
-            onClick={onToggleDark}
-            className="p-2 md:px-4 md:py-3 rounded-full bg-gray-lighter dark:bg-navy-light hover:bg-gray-hover dark:hover:bg-navy text-navy-light dark:text-white transition-all"
-            aria-label="Toggle dark mode"
-          >
-            {dark ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <button
-            onClick={initializeGame}
-            className="bg-orange hover:bg-orange-hover text-white px-5 py-2 md:px-8 md:py-3 rounded-full font-bold md:text-xl transition-all"
-          >
-            Restart
-          </button>
-          <button
-            onClick={onNewGame}
-            className="bg-gray-lighter dark:bg-navy-light hover:bg-gray-hover dark:hover:bg-navy text-navy-light dark:text-white px-5 py-2 md:px-8 md:py-3 rounded-full font-bold md:text-xl transition-all"
-          >
-            New Game
-          </button>
+      <div className="flex items-center justify-between px-6 py-6 md:px-14 md:py-8">
+        <button
+          onClick={onNewGame}
+          className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-base md:text-xl font-bold transition-all ${
+            dark
+              ? "bg-navy hover:bg-navy-dark text-white"
+              : "bg-gray-medium hover:bg-gray-hover text-navy-light"
+          }`}
+        >
+          New Game
+        </button>
+
+        <div className="flex items-center gap-6 md:gap-10">
+          <div className={`text-center ${dark ? "text-white" : "text-navy"}`}>
+            <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-gray-text">
+              Time
+            </span>
+            <p className="text-xl md:text-3xl font-bold">{formatTime(time)}</p>
+          </div>
+          <div className={`text-center ${dark ? "text-white" : "text-navy"}`}>
+            <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-gray-text">
+              Moves
+            </span>
+            <p className="text-xl md:text-3xl font-bold">{moves}</p>
+          </div>
         </div>
+
+        <button
+          onClick={onToggleDark}
+          className={`p-2 md:p-3 rounded-full transition-all ${
+            dark
+              ? "bg-navy hover:bg-navy-dark text-white"
+              : "bg-gray-medium hover:bg-gray-hover text-navy-light"
+          }`}
+          aria-label="Toggle dark mode"
+        >
+          {dark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
       </div>
 
-      {/* Grid */}
-      <div className={`grid ${is6x6 ? 'grid-cols-6 gap-2 md:gap-4' : 'grid-cols-4 gap-3 md:gap-6'} mb-10 md:mb-24`}>
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            value={card.value}
-            theme={theme}
-            size={size}
-            isFlipped={flipped.includes(card.id)}
-            isMatched={matched.includes(card.id)}
-            onClick={() => handleCardClick(card.id)}
-            dark={dark}
-          />
-        ))}
-      </div>
-
-      {/* Stats */}
-      <div className="w-full max-w-[1110px] flex justify-center gap-6 md:gap-8">
-        <div className="bg-gray-lighter dark:bg-navy-light flex flex-col md:flex-row items-center md:justify-between px-6 py-4 md:py-6 md:px-8 rounded-xl flex-1 max-w-[255px] transition-colors duration-300">
-          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">Time</span>
-          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">{formatTime(timer)}</span>
-        </div>
-        <div className="bg-gray-lighter dark:bg-navy-light flex flex-col md:flex-row items-center md:justify-between px-6 py-4 md:py-6 md:px-8 rounded-xl flex-1 max-w-[255px] transition-colors duration-300">
-          <span className="text-gray-text dark:text-gray-medium font-bold md:text-xl">Moves</span>
-          <span className="text-navy-light dark:text-white text-xl md:text-3xl font-bold">{moves}</span>
+      {/* Game Board */}
+      <div className="flex items-center justify-center px-4 md:px-6 pb-8">
+        <div className={`grid ${gridCols} gap-2 md:gap-4`}>
+          {cards.map((value, index) => (
+            <Card
+              key={index}
+              value={theme === "Icons" ? value : value}
+              isFlipped={
+                flippedCards.includes(index) || matchedCards.includes(index)
+              }
+              isMatched={matchedCards.includes(index)}
+              onClick={() => handleCardClick(index)}
+              size={size}
+              theme={theme}
+              dark={dark}
+            />
+          ))}
         </div>
       </div>
 
       {/* Win Modal */}
-      {isGameOver && (
+      {gameWon && (
         <WinModal
-          time={formatTime(timer)}
+          time={formatTime(time)}
           moves={moves}
           onRestart={initializeGame}
           onNewGame={onNewGame}
